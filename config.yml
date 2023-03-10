@@ -1,0 +1,7 @@
+preset:
+  - name: 音效预设
+    describe: 分类音效配置
+    config:
+      - targetDir: /Users/kerin/Downloads/music
+        rule: keyword
+        action: remove
