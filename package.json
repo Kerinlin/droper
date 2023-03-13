@@ -19,7 +19,8 @@
     "js-yaml": "^4.1.0",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
-    "vuex": "^4.0.0"
+    "vuex": "^4.0.0",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.2/xlsx-0.19.2.tgz"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
