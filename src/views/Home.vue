@@ -81,7 +81,7 @@ onMounted(() => {
   }
 }
 .button {
-  margin-top: 18px;
+  margin-top: 70px;
   -webkit-app-region: no-drag;
   height: 85px;
   width: 200px;
