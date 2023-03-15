@@ -73,6 +73,12 @@ const handleIpcMessage = win => {
         console.log(err);
       });
   });
+
+  ipcMain.on('requestAppPath', e => {
+    const appPath = app.isPackaged ? path.dirname(app.getPath('exe')) : app.getAppPath();
+    const configPath = path.join(appPath, 'config.yml');
+    e.reply('getAppPath', configPath);
+  });
 };
 
 module.exports = {

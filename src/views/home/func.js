@@ -79,6 +79,7 @@ export const handleFiles = (files, configList) => {
           resolve();
         }
       } catch (error) {
+        console.log(error);
         reject(error);
       }
     });

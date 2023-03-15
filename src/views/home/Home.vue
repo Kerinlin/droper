@@ -28,9 +28,9 @@ let configList = ref([]);
 let logContent = ref(null);
 let dropedFiles = ref([]);
 let loading = ref(false);
-
+let settingsPath = ref(null);
 const ipcRenderer = window?.ipcRenderer;
-const configPath = window?.electronApp?.configPath;
+// const configPath = window?.electronApp?.configPath;
 const message = useMessage();
 // console.log(configPath);
 
@@ -44,14 +44,14 @@ const addFile = async e => {
     const excelData = handleXlsx(data);
     console.log({ excelData });
     let configData = {
-      configPath: configPath,
+      configPath: settingsPath.value,
       config: {
         config: excelData,
       },
     };
     localStorage.removeItem('configPath');
     localStorage.removeItem('configName');
-    localStorage.setItem('configPath', configPath);
+    localStorage.setItem('configPath', settingsPath.value);
     localStorage.setItem('configName', excelData[0]?.name);
     ipcRenderer.send('setConfig', JSON.stringify(configData));
     message.success('导入配置成功');
@@ -85,6 +85,11 @@ onMounted(() => {
   if (configPath) {
     ipcRenderer?.send('loadConfig', configPath);
   }
+  ipcRenderer?.send('requestAppPath');
+  ipcRenderer?.on('getAppPath', (e, data) => {
+    console.log(data);
+    settingsPath.value = data;
+  });
   ipcRenderer?.on('configDeatil', (e, data) => {
     configList.value = data?.data?.config;
   });
