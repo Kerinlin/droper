@@ -1,12 +1,15 @@
 <template>
   <div class="home flex flex-col items-center" @drop.prevent="addFile" @dragover.prevent>
-    <div class="input-wrapper">
-      <label for="getFiles">
-        <div v-if="logContent" class="filename">
-          {{ logContent }}
-        </div>
-      </label>
-    </div>
+    <n-spin :show="loading" stroke="#fff" size="large">
+      <div class="input-wrapper">
+        <label for="getFiles">
+          <div v-if="logContent" class="filename">
+            {{ logContent }}
+          </div>
+        </label>
+      </div>
+      <template #description> 分类中... </template>
+    </n-spin>
     <n-tooltip trigger="hover">
       <template #trigger>
         <button class="button" @click="start"></button>
@@ -18,17 +21,18 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { NTooltip, useMessage } from 'naive-ui';
-import { useDropFile, handleXlsx } from './func';
+import { NTooltip, useMessage, NSpin } from 'naive-ui';
+import { useDropFile, handleXlsx, handleMoveFile, handleDirPath, handleFiles } from './func';
 
 let configList = ref([]);
 let logContent = ref(null);
 let dropedFiles = ref([]);
+let loading = ref(false);
+
 const ipcRenderer = window?.ipcRenderer;
-const nodePath = window?.nodePath?.path;
 const configPath = window?.electronApp?.configPath;
 const message = useMessage();
-console.log(configPath);
+// console.log(configPath);
 
 // 拖拽文件夹
 const addFile = async e => {
@@ -56,18 +60,22 @@ const addFile = async e => {
 };
 
 const start = () => {
+  loading.value = true;
   const { dropedDirPaths, dropedFilePaths } = useDropFile(dropedFiles.value);
   const dirPathArray = dropedDirPaths.value;
   const filePathArray = dropedFilePaths.value;
   if (dirPathArray.length > 0) {
-    console.log(dirPathArray.length);
+    dirPathArray.map(async dirPath => {
+      const files = await handleDirPath(dirPath);
+      await handleFiles(files, configList.value);
+      console.log('处理完毕');
+      loading.value = false;
+    });
   }
 
   if (filePathArray.length > 0) {
-    console.log(filePathArray.length);
-    filePathArray.map(filePath => {
-      const { name } = nodePath.parse(filePath);
-      console.log(name);
+    filePathArray.map(async filePath => {
+      handleMoveFile(filePath, configList.value);
     });
   }
 };
@@ -121,6 +129,16 @@ onMounted(() => {
       opacity: 0;
       position: absolute;
       z-index: -1;
+    }
+  }
+  &::v-deep {
+    .n-spin-description {
+      display: inline-block;
+      white-space: nowrap;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 2px;
     }
   }
 }
