@@ -51,11 +51,9 @@ app.on('activate', () => {
 });
 
 app.on('ready', async () => {
-  if (isDevelopment) {
-    globalShortcut.register('CommandOrControl+K', function () {
-      win.webContents.openDevTools();
-    });
-  }
+  globalShortcut.register('CommandOrControl+K', function () {
+    win.webContents.openDevTools();
+  });
   createWindow();
   handleIpcMessage(win);
 });

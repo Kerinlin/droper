@@ -25,6 +25,7 @@ module.exports = {
   plugins: ['vue', 'prettier'],
   rules: {
     semi: ['warn', 'always'],
+    'prettier/prettier': 0,
     'vue/multi-word-component-names': 0,
     'no-unused-vars': 1,
   },

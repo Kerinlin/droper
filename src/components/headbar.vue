@@ -68,6 +68,7 @@ const close = () => {
             fill: currentColor;
           }
         }
+         -webkit-app-region: no-drag;
       }
     }
   }

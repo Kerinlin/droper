@@ -207,6 +207,7 @@ defineExpose({
   left: 50%;
   top: 45px;
   transform: translateX(-50%);
+   -webkit-app-region: no-drag;
   .modal-content {
     font-size: 14px;
     .config-item {

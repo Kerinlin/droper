@@ -2,3 +2,9 @@ body {
   -webkit-app-region: drag;
   font-size: 12px;
 }
+i{
+  -webkit-app-region: no-drag;
+}
+button{
+  -webkit-app-region: no-drag;
+}
