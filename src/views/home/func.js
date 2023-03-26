@@ -4,6 +4,7 @@ const isDir = window?.fs?.isDir;
 const move = window?.fs?.move;
 const readFiles = window?.fs?.readFiles;
 const nodePath = window?.nodePath?.path;
+import { read, utils } from 'xlsx';
 // 处理拖拽文件
 export const useDropFile = files => {
   let fileObj = {
@@ -27,20 +28,23 @@ export const handleMoveFile = (filePath, configList) => {
   return new Promise((resolve, reject) => {
     try {
       const { name, base } = nodePath.parse(filePath);
-      configList.map(item => {
+      const filename = name.toLowerCase();
+      configList.map(async item => {
         const filteredKeywords = item?.keywords?.filter(keyword => keyword.trim() !== '');
         if (filteredKeywords?.length > 0) {
-          const regex = new RegExp(filteredKeywords.join('|'), 'gi');
-          const matches = name.match(regex);
-          if (matches?.length > 0) {
-            const targetPath = nodePath.join(item.targetDir, base);
-            move(filePath, targetPath, err => {
-              if (err) return console.error(err);
-            });
-            resolve();
+          let len = filteredKeywords.length;
+          for (let i = 0; i < len; i++) {
+            const keyword = filteredKeywords[i];
+            if (filename.includes(keyword)) {
+              console.log('匹配关键字', keyword);
+              const targetPath = nodePath.join(item.targetDir, base);
+              console.log(`路径: ${filePath} => ${targetPath}`);
+              await move(filePath, targetPath);
+            }
           }
         }
       });
+      resolve();
     } catch (error) {
       reject(error);
     }
@@ -76,7 +80,7 @@ export const handleFiles = (files, configList) => {
           handleFiles(files, configList);
         } else {
           await handleMoveFile(filePath, configList);
-          resolve();
+          resolve(true);
         }
       } catch (error) {
         console.log(error);
@@ -87,23 +91,20 @@ export const handleFiles = (files, configList) => {
 
   // console.log();
 };
-
-// 处理文件，如果是目录就递归，如果是文件就执行移动操作
-// export const handleFiles = async (files, configList) => {
-//   const promises = [];
-//   for (const filePath of files) {
-//     try {
-//       const isDirPath = isDir(filePath);
-//       if (isDirPath) {
-//         const subFiles = await handleDirPath(filePath);
-//         promises.push(handleFiles(subFiles, configList));
-//       } else {
-//         promises.push(handleMoveFile(filePath, configList));
-//       }
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   }
-//   await Promise.all(promises);
-//   console.log('所有文件已处理完毕');
-// };
+// 处理表格
+export const handleXlsx = data => {
+  const workbook = read(data);
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+  const jsonData = utils.sheet_to_json(worksheet);
+  const handledJsonData = jsonData.map(item => {
+    if (!item.keywords) {
+      item.keywords = [];
+    }
+    if (item?.keywords?.length > 0) {
+      item.keywords = item.keywords?.split(',');
+    }
+    return item;
+  });
+  return handledJsonData;
+};

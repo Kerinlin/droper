@@ -12,7 +12,7 @@ module.exports = defineConfig({
         appId: "com.electron.yinxiao",
         productName: "音效分类",
         win: {
-          icon: "public/icon.ico",
+          icon: "public/logo.png",
           artifactName: "音效分类-${version}.${ext}",
           executableName: '音效分类',
         },

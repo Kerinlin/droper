@@ -69,13 +69,18 @@ const start = () => {
       const files = await handleDirPath(dirPath);
       await handleFiles(files, configList.value);
       console.log('处理完毕');
-      loading.value = false;
+      setTimeout(() => {
+        loading.value = false;
+      }, 1000);
     });
   }
 
   if (filePathArray.length > 0) {
     filePathArray.map(async filePath => {
-      handleMoveFile(filePath, configList.value);
+      await handleMoveFile(filePath, configList.value);
+      setTimeout(() => {
+        loading.value = false;
+      }, 1000);
     });
   }
 };
@@ -101,6 +106,7 @@ onMounted(() => {
   width: 100%;
   height: calc(100vh - 45px);
   margin-top: 20px;
+  -webkit-app-region: no-drag;
   .input-wrapper {
     width: 100%;
     height: 150px;
@@ -149,7 +155,7 @@ onMounted(() => {
 }
 .button {
   margin-top: 70px;
-  -webkit-app-region: no-drag;
+
   height: 85px;
   width: 200px;
   border: 1px dashed transparent;

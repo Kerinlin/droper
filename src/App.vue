@@ -17,7 +17,7 @@ import headbar from './components/headbar.vue';
   // background-color: #292c33;
   width: 100%;
   height: 100vh;
-  background-image: url('https://github.com/Kerinlin/droper/blob/main/src/assets/backgroundImage.png?raw=true');
+  background-image: url('https://i.328888.xyz/2023/03/26/iDMp2Q.png');
   background-size: cover;
   .header-container {
     width: 100%;
