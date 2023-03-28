@@ -51,7 +51,7 @@ app.on('activate', () => {
 });
 
 app.on('ready', async () => {
-  globalShortcut.register('CommandOrControl+K', function () {
+  globalShortcut.register('CommandOrControl+I', function () {
     win.webContents.openDevTools();
   });
   createWindow();

@@ -26,30 +26,41 @@ export const useDropFile = files => {
 // 检索关键字并移动文件
 export const handleMoveFile = async (filePath, configList) => {
   const { name, base } = nodePath.parse(filePath);
-  const filename = name.toLowerCase();
+  const reg = /[`~_!-@#$^&*%()=|{}':;',.<>\\/?~！@#￥……&*（）——|{}'；：""'。，、？\s]/g;
+  let lowerName = name.toLowerCase();
+  const filename = lowerName.replace(reg, " ");
+  console.log({ filename });
   const movedFiles = {};
+
   for (const item of configList) {
     const filteredKeywords = item?.keywords?.filter(keyword => keyword.trim() !== '');
     if (filteredKeywords?.length > 0) {
-      for (const keyword of filteredKeywords) {
-        if (filename.includes(keyword)) {
-          console.log('匹配关键字', keyword);
-          const dir = nodePath.join(item.targetDir, base);
-          const moved = (await Promise.all(Object.values(movedFiles).map(async (movedDir) => {
-            if (movedDir === dir) {
-              console.log(`文件 ${filePath} 已经被移动到目录 ${dir}，跳过移动操作`);
-              return true;
-            } else {
-              return false;
-            }
-          }))).some(result => result);
-          if (!moved) {
-            console.log(`移动文件 ${filePath} 到目录 ${dir}`);
-            await move(filePath, dir);
-            movedFiles[filePath] = dir;
+      const anyKeywordMatched = filteredKeywords.some(keyword => {
+        const subKeywords = keyword.toLowerCase().split(' ');
+        return subKeywords.every(subKeyword => {
+          const regex = new RegExp(`\\b${subKeyword}\\b`, 'i');
+          if (regex.test(filename)) {
+            return true;
           }
-          break;
+        });
+      });
+      if (anyKeywordMatched) {
+        console.log('匹配关键字', filteredKeywords.join(', '));
+        const dir = nodePath.join(item.targetDir, base);
+        const moved = (await Promise.all(Object.values(movedFiles).map(async (movedDir) => {
+          if (movedDir === dir) {
+            console.log(`文件 ${filePath} 已经被移动到目录 ${dir}，跳过移动操作`);
+            return true;
+          } else {
+            return false;
+          }
+        }))).some(result => result);
+        if (!moved) {
+          console.log(`移动文件 ${filePath} 到目录 ${dir}`);
+          await move(filePath, dir);
+          movedFiles[filePath] = dir;
         }
+        break;
       }
     }
   }

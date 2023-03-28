@@ -110,7 +110,7 @@ const changeConfig = () => {
       config: configList.value,
     },
   };
-  console.log('配置文件', configData);
+  // console.log('配置文件', configData);
   ipcRenderer.send('setConfig', JSON.stringify(configData));
 };
 
@@ -130,6 +130,7 @@ const deleteConfig = () => {
       configList.value.splice(index, 1);
     }
   });
+  localStorage.removeItem('configName');
   console.log('删除后的配置', configList.value);
   changeConfig();
 };
@@ -153,23 +154,21 @@ const openModal = () => {
 onMounted(() => {
   // 新配置
   ipcRenderer?.on('newConfig', (e, path) => {
+    console.log(path);
     localStorage.removeItem('configPath');
     if (path) {
       localStorage.setItem('configPath', path);
       configPath.value = path;
-      if (configList.value.length > 0) {
-        localStorage.setItem('configName', configList.value[configList.value.length - 1].name);
-      }
       ipcRenderer?.send('loadConfig', path);
     }
   });
 
   // 获取配置内容
-  ipcRenderer?.on('configDeatil', (e, data) => {
+  ipcRenderer?.on('configDeatil', (e, data) => {   
     let remoteName = localStorage.getItem('configName');
     configList.value = data.data.config;
     configPath.value = data.path;
-    console.log({ remoteName });
+    // console.log({ remoteName });
     if (!remoteName) {
       localStorage.getItem('configName', configList.value[0]?.name);
       configName.value = configList.value[0]?.name;
