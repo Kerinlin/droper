@@ -29,7 +29,13 @@ export const handleMoveFile = async (filePath, configList) => {
   const reg = /[`~_!-@#$^&*%()=|{}':;',.<>\\/?~！@#￥……&*（）——|{}'；：""'。，、？\s]/g;
   let lowerName = name.toLowerCase();
   const filename = lowerName.replace(reg, " ");
-  console.log({ filename });
+  // console.log({ filename });
+  const regex = /(.*?)【(.*)】/; // 匹配左右括号中的任意字符，非贪婪模式
+  const result = filename.match(regex);
+  const part1 = result[1]; // 获取匹配到的左括号前面的内容
+  const part2 = result[2]; // 获取匹配到的括号中的内容
+  console.log(part1); // 输出：xxhdsf 神神叨叨 
+  console.log(part2); // 输出：test sscd
   const movedFiles = {};
 
   for (const item of configList) {
@@ -45,16 +51,17 @@ export const handleMoveFile = async (filePath, configList) => {
         });
       });
       if (anyKeywordMatched) {
-        console.log('匹配关键字', filteredKeywords.join(', '));
+        console.log('匹配关键字', filteredKeywords.join(','));
         const dir = nodePath.join(item.targetDir, base);
-        const moved = (await Promise.all(Object.values(movedFiles).map(async (movedDir) => {
+        let moved = (await Promise.all(Object.values(movedFiles).map(async (movedDir) => {
           if (movedDir === dir) {
-            console.log(`文件 ${filePath} 已经被移动到目录 ${dir}，跳过移动操作`);
+            console.log(`文件 ${filePath} 已经被移动到目录 ${dir}或者文件名中包含【】，跳过移动操作`);
             return true;
           } else {
             return false;
           }
         }))).some(result => result);
+
         if (!moved) {
           console.log(`移动文件 ${filePath} 到目录 ${dir}`);
           await move(filePath, dir);
