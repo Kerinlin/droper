@@ -30,12 +30,9 @@ export const handleMoveFile = async (filePath, configList) => {
   let lowerName = name.toLowerCase();
   const filename = lowerName.replace(reg, " ");
   // console.log({ filename });
-  const regex = /(.*?)【(.*)】/; // 匹配左右括号中的任意字符，非贪婪模式
+  const regex = /(.*?)【(.*)】/;
   const result = filename.match(regex);
-  const part1 = result[1]; // 获取匹配到的左括号前面的内容
-  const part2 = result[2]; // 获取匹配到的括号中的内容
-  console.log(part1); // 输出：xxhdsf 神神叨叨 
-  console.log(part2); // 输出：test sscd
+  const splitFileName = result[1] || filename;
   const movedFiles = {};
 
   for (const item of configList) {
@@ -45,7 +42,7 @@ export const handleMoveFile = async (filePath, configList) => {
         const subKeywords = keyword.toLowerCase().split(' ');
         return subKeywords.every(subKeyword => {
           const regex = new RegExp(`\\b${subKeyword}\\b`, 'i');
-          if (regex.test(filename)) {
+          if (regex.test(splitFileName)) {
             return true;
           }
         });
